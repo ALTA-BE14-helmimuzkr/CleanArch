@@ -57,7 +57,9 @@ func (bh *bookHandle) Update() echo.HandlerFunc {
 			return c.JSON(helper.PrintErrorResponse(err.Error()))
 		}
 
-		return c.JSON(helper.PrintSuccessReponse(http.StatusCreated, "sukses mengubah buku", res))
+		book := ToResponse("update", res)
+
+		return c.JSON(helper.PrintSuccessReponse(http.StatusOK, "sukses mengubah buku", book))
 	}
 }
 
@@ -73,7 +75,7 @@ func (bh *bookHandle) Delete() echo.HandlerFunc {
 			return c.JSON(helper.PrintErrorResponse(err.Error()))
 		}
 
-		return c.JSON(helper.PrintSuccessReponse(http.StatusCreated, "sukses menghapus buku"))
+		return c.JSON(helper.PrintSuccessReponse(http.StatusOK, "sukses menghapus buku"))
 	}
 }
 
@@ -86,7 +88,7 @@ func (bh *bookHandle) MyBook() echo.HandlerFunc {
 
 		listRes := ToListResponse(res)
 
-		return c.JSON(http.StatusOK, listRes)
+		return c.JSON(helper.PrintSuccessReponse(http.StatusOK, "sukses menampilkan koleksi buku", listRes))
 	}
 }
 
@@ -99,6 +101,6 @@ func (bh *bookHandle) GetAllBook() echo.HandlerFunc {
 
 		listRes := ToListResponse(res)
 
-		return c.JSON(http.StatusOK, listRes)
+		return c.JSON(helper.PrintSuccessReponse(http.StatusOK, "sukses menampilkan semua buku", listRes))
 	}
 }

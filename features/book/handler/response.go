@@ -16,21 +16,20 @@ type AddBookResponse struct {
 }
 
 func ToResponse(feature string, book book.Core) interface{} {
-	switch feature {
-	case "add":
+	if feature == "add" || feature == "update" {
 		return AddBookResponse{
 			Judul:       book.Judul,
 			TahunTerbit: book.TahunTerbit,
 			Penulis:     book.Penulis,
 		}
-	default:
-		return BookResponse{
-			ID:          book.ID,
-			Judul:       book.Judul,
-			TahunTerbit: book.TahunTerbit,
-			Penulis:     book.Penulis,
-			Pemilik:     book.Pemilik,
-		}
+	}
+
+	return BookResponse{
+		ID:          book.ID,
+		Judul:       book.Judul,
+		TahunTerbit: book.TahunTerbit,
+		Penulis:     book.Penulis,
+		Pemilik:     book.Pemilik,
 	}
 }
 

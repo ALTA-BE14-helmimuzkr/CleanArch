@@ -57,7 +57,7 @@ func (bd *bookData) Update(userID int, bookID int, updatedData book.Core) (book.
 
 func (bd *bookData) Delete(userID int, bookID int) error {
 	// DB Delete(table or value)
-	tx := bd.db.Where("id = ? AND user_id = ?", bookID, userID).Delete(Books{})
+	tx := bd.db.Where("id = ? AND user_id = ?", bookID, userID).Delete(&Books{})
 	if tx.Error != nil {
 		log.Println("delete book query error :", tx.Error)
 		return tx.Error
