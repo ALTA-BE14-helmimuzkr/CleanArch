@@ -39,14 +39,14 @@ func (bd *bookData) Update(userID int, bookID int, updatedData book.Core) (book.
 	cnv := CoreToData(updatedData)
 
 	// DB Update(value)
-	qry := bd.db.Where("id = ? && user_id = ?", bookID, userID).Updates(&cnv)
-	if qry.Error != nil {
-		log.Println("update book query error :", qry.Error)
-		return book.Core{}, qry.Error
+	tx := bd.db.Where("id = ? && user_id = ?", bookID, userID).Updates(&cnv)
+	if tx.Error != nil {
+		log.Println("update book query error :", tx.Error)
+		return book.Core{}, tx.Error
 	}
 
 	// Rows affected checking
-	if qry.RowsAffected <= 0 {
+	if tx.RowsAffected <= 0 {
 		log.Println("update book query error : data not found")
 		return book.Core{}, errors.New("not found")
 	}
@@ -57,14 +57,14 @@ func (bd *bookData) Update(userID int, bookID int, updatedData book.Core) (book.
 
 func (bd *bookData) Delete(userID int, bookID int) error {
 	// DB Delete(table or value)
-	qry := bd.db.Where("id = ? AND user_id = ?", bookID, userID).Delete(Books{})
-	if qry.Error != nil {
-		log.Println("delete book query error :", qry.Error)
-		return qry.Error
+	tx := bd.db.Where("id = ? AND user_id = ?", bookID, userID).Delete(Books{})
+	if tx.Error != nil {
+		log.Println("delete book query error :", tx.Error)
+		return tx.Error
 	}
 
 	// Rows affected checking
-	if qry.RowsAffected <= 0 {
+	if tx.RowsAffected <= 0 {
 		log.Println("delete book query error : data not found")
 		return errors.New("not found")
 	}
@@ -82,6 +82,10 @@ func (bd *bookData) MyBook(userID int) ([]book.Core, error) {
 		return nil, err
 	}
 
+	if myBooks == nil {
+		return nil, errors.New("books not found")
+	}
+
 	// Convert []BookPemilik model to []book.Core
 	var bookCore = ToCoreSlice(myBooks)
 
@@ -96,6 +100,10 @@ func (bd *bookData) GetAllBook() ([]book.Core, error) {
 	err := bd.db.Raw("SELECT books.id, books.judul, books.tahun_terbit, books.penulis, users.nama FROM books JOIN users ON users.id = books.user_id WHERE books.deleted_at IS NULL").Find(&books).Error
 	if err != nil {
 		return nil, err
+	}
+
+	if books == nil {
+		return nil, errors.New("books not found")
 	}
 
 	// Convert []BookPemilik model to []book.Core
