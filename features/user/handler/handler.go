@@ -78,3 +78,14 @@ func (uc *userControll) Update() echo.HandlerFunc {
 		return c.JSON(helper.PrintSuccessReponse(http.StatusOK, "berhasil update profile"))
 	}
 }
+
+func (uc *userControll) Deactive() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		err := uc.srv.Deactive(c.Get("user"))
+		if err != nil {
+			return c.JSON(helper.PrintErrorResponse(err.Error()))
+		}
+
+		return c.JSON(helper.PrintSuccessReponse(http.StatusOK, "berhasil deactive account"))
+	}
+}

@@ -41,7 +41,7 @@ func (uq *userQuery) Register(newUser user.Core) (user.Core, error) {
 }
 func (uq *userQuery) Profile(id uint) (user.Core, error) {
 	res := User{}
-	if err := uq.db.Where("id = ?", id).First(&res).Error; err != nil {
+	if err := uq.db.Where("id = ? AND deleted_at IS NULL", id).First(&res).Error; err != nil {
 		log.Println("Get By ID query error", err.Error())
 		return user.Core{}, err
 	}
@@ -65,6 +65,17 @@ func (uq *userQuery) Update(id uint, updateData user.Core) (user.Core, error) {
 	return ToCore(dataModel), nil
 }
 
-// func (uq *userQuery) Deactive(id uint) error {
+func (uq *userQuery) Deactive(id uint) error {
+	tx := uq.db.Delete(User{}, id)
+	if tx.Error != nil {
+		log.Println("Delete query error", tx.Error.Error())
+		return tx.Error
+	}
 
-// }
+	if tx.RowsAffected < 0 {
+		log.Println("Rows affected delete error")
+		return errors.New("user not found")
+	}
+
+	return nil
+}

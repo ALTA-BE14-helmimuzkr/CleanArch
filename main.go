@@ -31,15 +31,16 @@ func main() {
 	e.Pre(middleware.RemoveTrailingSlash())
 	e.Use(middleware.CORS())
 	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
-		Format:           "${time_custom}, method=${method}, uri=${uri}, status=${status}",
+		Format:           "${time_custom}, method=${method}, uri=${uri}, status=${status}\n",
 		CustomTimeFormat: "2006-01-02 15:04:05",
 	}))
 
 	e.POST("/register", userHdl.Register())
 	e.POST("/login", userHdl.Login())
 
+	e.GET("/users/profile", userHdl.Profile(), middleware.JWT([]byte(config.JWT_KEY)))
 	e.PUT("/users", userHdl.Update(), middleware.JWT([]byte(config.JWT_KEY)))
-	e.GET("/users", userHdl.Profile(), middleware.JWT([]byte(config.JWT_KEY)))
+	e.DELETE("/users", userHdl.Deactive(), middleware.JWT([]byte(config.JWT_KEY)))
 
 	e.POST("/books", bookHdl.Add(), middleware.JWT([]byte(config.JWT_KEY)))
 	e.PUT("/books/:id", bookHdl.Update(), middleware.JWT([]byte(config.JWT_KEY)))

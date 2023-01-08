@@ -31,9 +31,9 @@ func (uuc *userUseCase) Login(email, password string) (string, user.Core, error)
 	if err != nil {
 		msg := ""
 		if strings.Contains(err.Error(), "not found") {
-			msg = "data tidak ditemukan"
+			msg = "data not found"
 		} else {
-			msg = "terdapat masalah pada server"
+			msg = "internal server error"
 		}
 		return "", user.Core{}, errors.New(msg)
 	}
@@ -66,7 +66,7 @@ func (uuc *userUseCase) Register(newUser user.Core) (user.Core, error) {
 		if strings.Contains(err.Error(), "duplicated") {
 			msg = "data sudah terdaftar"
 		} else {
-			msg = "terdapat masalah pada server"
+			msg = "internal server error"
 		}
 		return user.Core{}, errors.New(msg)
 	}
@@ -76,15 +76,15 @@ func (uuc *userUseCase) Register(newUser user.Core) (user.Core, error) {
 func (uuc *userUseCase) Profile(token interface{}) (user.Core, error) {
 	id := helper.ExtractToken(token)
 	if id <= 0 {
-		return user.Core{}, errors.New("data tidak ditemukan")
+		return user.Core{}, errors.New("data not found")
 	}
 	res, err := uuc.qry.Profile(uint(id))
 	if err != nil {
 		msg := ""
 		if strings.Contains(err.Error(), "not found") {
-			msg = "data tidak ditemukan"
+			msg = "data not found"
 		} else {
-			msg = "terdapat masalah pada server"
+			msg = "internal server error"
 		}
 		return user.Core{}, errors.New(msg)
 	}
@@ -94,18 +94,37 @@ func (uuc *userUseCase) Profile(token interface{}) (user.Core, error) {
 func (uuc *userUseCase) Update(token interface{}, updateData user.Core) (user.Core, error) {
 	id := helper.ExtractToken(token)
 	if id <= 0 {
-		return user.Core{}, errors.New("data tidak ditemukan")
+		return user.Core{}, errors.New("data not found")
 	}
 
 	res, err := uuc.qry.Update(uint(id), updateData)
 	if err != nil {
 		msg := ""
 		if strings.Contains(err.Error(), "not found") {
-			msg = "data tidak ditemukan"
+			msg = "data not found"
 		} else {
-			msg = "terdapat masalah pada server"
+			msg = "internal server error"
 		}
 		return user.Core{}, errors.New(msg)
 	}
 	return res, nil
+}
+
+func (uuc *userUseCase) Deactive(token interface{}) error {
+	id := helper.ExtractToken(token)
+	if id <= 0 {
+		return errors.New("data not found")
+	}
+
+	err := uuc.qry.Deactive(uint(id))
+	if err != nil {
+		msg := ""
+		if strings.Contains(err.Error(), "not found") {
+			msg = "data not found"
+		} else {
+			msg = "internal server error"
+		}
+		return errors.New(msg)
+	}
+	return nil
 }
