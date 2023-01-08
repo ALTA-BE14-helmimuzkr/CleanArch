@@ -82,10 +82,6 @@ func (bd *bookData) MyBook(userID int) ([]book.Core, error) {
 		return nil, err
 	}
 
-	if myBooks == nil {
-		return nil, errors.New("books not found")
-	}
-
 	// Convert []BookPemilik model to []book.Core
 	var bookCore = ToCoreSlice(myBooks)
 
@@ -100,10 +96,6 @@ func (bd *bookData) GetAllBook() ([]book.Core, error) {
 	err := bd.db.Raw("SELECT books.id, books.judul, books.tahun_terbit, books.penulis, users.nama FROM books JOIN users ON users.id = books.user_id WHERE books.deleted_at IS NULL").Find(&books).Error
 	if err != nil {
 		return nil, err
-	}
-
-	if books == nil {
-		return nil, errors.New("books not found")
 	}
 
 	// Convert []BookPemilik model to []book.Core

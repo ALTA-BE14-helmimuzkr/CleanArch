@@ -115,6 +115,10 @@ func (bs *bookSrv) MyBook(token interface{}) ([]book.Core, error) {
 		return nil, errors.New(msg)
 	}
 
+	if len(res) < 1 {
+		return nil, errors.New("books not found")
+	}
+
 	return res, nil
 }
 
@@ -128,6 +132,10 @@ func (bs *bookSrv) GetAllBook() ([]book.Core, error) {
 			msg = "internal server error"
 		}
 		return nil, errors.New(msg)
+	}
+
+	if len(res) < 1 {
+		return nil, errors.New("books not found")
 	}
 
 	return res, nil
