@@ -49,9 +49,22 @@ func (uq *userQuery) Profile(id uint) (user.Core, error) {
 	return ToCore(res), nil
 }
 
-// func (uq *userQuery) Update(id uint, updateData user.Core) (user.Core, error) {
+func (uq *userQuery) Update(id uint, updateData user.Core) (user.Core, error) {
+	dataModel := CoreToData(updateData)
+	tx := uq.db.Model(User{}).Where("id = ?", id).Updates(&dataModel)
+	if tx.Error != nil {
+		log.Println("Update query error", tx.Error.Error())
+		return user.Core{}, tx.Error
+	}
 
-// }
+	if tx.RowsAffected < 1 {
+		log.Println("Rows affected update error")
+		return user.Core{}, errors.New("user not found")
+	}
+
+	return ToCore(dataModel), nil
+}
+
 // func (uq *userQuery) Deactive(id uint) error {
 
 // }
