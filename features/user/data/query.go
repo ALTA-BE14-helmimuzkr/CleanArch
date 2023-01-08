@@ -51,7 +51,7 @@ func (uq *userQuery) Profile(id uint) (user.Core, error) {
 
 func (uq *userQuery) Update(id uint, updateData user.Core) (user.Core, error) {
 	dataModel := CoreToData(updateData)
-	tx := uq.db.Model(User{}).Where("id = ?", id).Updates(&dataModel)
+	tx := uq.db.Model(&User{}).Where("id = ?", id).Updates(&dataModel)
 	if tx.Error != nil {
 		log.Println("Update query error", tx.Error.Error())
 		return user.Core{}, tx.Error
@@ -66,7 +66,7 @@ func (uq *userQuery) Update(id uint, updateData user.Core) (user.Core, error) {
 }
 
 func (uq *userQuery) Deactive(id uint) error {
-	tx := uq.db.Delete(User{}, id)
+	tx := uq.db.Where("id = ?", id).Delete(&User{})
 	if tx.Error != nil {
 		log.Println("Delete query error", tx.Error.Error())
 		return tx.Error
