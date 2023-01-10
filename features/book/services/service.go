@@ -4,36 +4,21 @@ import (
 	"api/features/book"
 	"api/helper"
 	"errors"
-	"log"
 	"strings"
-
-	"github.com/go-playground/validator/v10"
 )
 
 type bookSrv struct {
 	data book.BookData
-	vld  *validator.Validate
 }
 
 func New(d book.BookData) book.BookService {
-	return &bookSrv{
-		data: d,
-		vld:  validator.New(),
-	}
+	return &bookSrv{data: d}
 }
 
 func (bs *bookSrv) Add(token interface{}, newBook book.Core) (book.Core, error) {
 	userID := helper.ExtractToken(token)
 	if userID <= 0 {
 		return book.Core{}, errors.New("user not found")
-	}
-
-	err := bs.vld.Struct(newBook)
-	if err != nil {
-		if _, ok := err.(*validator.InvalidValidationError); ok {
-			log.Println(err)
-		}
-		return book.Core{}, errors.New("validation error")
 	}
 
 	res, err := bs.data.Add(userID, newBook)
@@ -54,14 +39,6 @@ func (bs *bookSrv) Update(token interface{}, bookID int, updatedData book.Core) 
 	userID := helper.ExtractToken(token)
 	if userID <= 0 {
 		return book.Core{}, errors.New("user not found")
-	}
-
-	err := bs.vld.Struct(updatedData)
-	if err != nil {
-		if _, ok := err.(*validator.InvalidValidationError); ok {
-			log.Println(err)
-		}
-		return book.Core{}, errors.New("validation error")
 	}
 
 	res, err := bs.data.Update(userID, bookID, updatedData)

@@ -4,9 +4,9 @@ import "github.com/labstack/echo/v4"
 
 type Core struct {
 	ID          uint
-	Judul       string `validate:"required"`
-	TahunTerbit int    `validate:"required,number"`
-	Penulis     string `validate:"required"`
+	Judul       string
+	TahunTerbit int
+	Penulis     string
 	Pemilik     string
 }
 

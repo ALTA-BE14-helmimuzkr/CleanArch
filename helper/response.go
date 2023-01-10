@@ -30,13 +30,28 @@ func PrintErrorResponse(msg string) (int, interface{}) {
 		resp["message"] = msg
 	}
 
-	if strings.Contains(msg, "server") {
+	// if strings.Contains(msg, "server") {
+	// 	code = http.StatusInternalServerError
+	// } else if strings.Contains(msg, "format") {
+	// 	code = http.StatusBadRequest
+	// } else if strings.Contains(msg, "not found") {
+	// 	code = http.StatusNotFound
+	// } else if strings.Contains(msg, "validation") {
+	// 	code = http.StatusBadRequest
+	// }
+
+	switch true {
+	case strings.Contains(msg, "server"):
 		code = http.StatusInternalServerError
-	} else if strings.Contains(msg, "format") {
+	case strings.Contains(msg, "format"):
 		code = http.StatusBadRequest
-	} else if strings.Contains(msg, "not found") {
+	case strings.Contains(msg, "not found"):
 		code = http.StatusNotFound
-	} else if strings.Contains(msg, "validation") {
+	case strings.Contains(msg, "conflict"):
+		code = http.StatusConflict
+	case strings.Contains(msg, "duplicate"):
+		code = http.StatusConflict
+	case strings.Contains(msg, "bad request"):
 		code = http.StatusBadRequest
 	}
 

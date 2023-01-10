@@ -3,8 +3,8 @@ package handler
 import "api/features/user"
 
 type LoginRequest struct {
-	Email    string `json:"email" form:"email"`
-	Password string `json:"password" form:"password"`
+	Email    string `json:"email" form:"email" validate:"required,email"`
+	Password string `json:"password" form:"password" validate:"required,min=4"`
 }
 
 type RegisterRequest struct {

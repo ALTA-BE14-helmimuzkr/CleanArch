@@ -28,6 +28,7 @@ func (uq *userQuery) Login(email string) (user.Core, error) {
 
 	return ToCore(res), nil
 }
+
 func (uq *userQuery) Register(newUser user.Core) (user.Core, error) {
 	cnv := CoreToData(newUser)
 	err := uq.db.Create(&cnv).Error
@@ -39,6 +40,7 @@ func (uq *userQuery) Register(newUser user.Core) (user.Core, error) {
 
 	return newUser, nil
 }
+
 func (uq *userQuery) Profile(id uint) (user.Core, error) {
 	res := User{}
 	if err := uq.db.Where("id = ? AND deleted_at IS NULL", id).First(&res).Error; err != nil {
