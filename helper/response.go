@@ -53,6 +53,8 @@ func PrintErrorResponse(msg string) (int, interface{}) {
 		code = http.StatusConflict
 	case strings.Contains(msg, "bad request"):
 		code = http.StatusBadRequest
+	case strings.Contains(msg, "validation"):
+		code = http.StatusBadRequest
 	}
 
 	return code, resp
