@@ -16,7 +16,7 @@ func TestLogin(t *testing.T) {
 	repo := mocks.NewUserData(t) // mock data
 	srv := New(repo)             // create new service object
 
-	t.Run("Login success", func(t *testing.T) {
+	t.Run("Login successfully", func(t *testing.T) {
 		// input dan respond untuk mock data
 		inputEmail := "helmi@gmail.com"
 		// res dari data akan mengembalik password yang sudah di hash
@@ -78,7 +78,7 @@ func TestProfile(t *testing.T) {
 	repo := mocks.NewUserData(t)
 	srv := New(repo) // create new service object
 
-	t.Run("Profile success", func(t *testing.T) {
+	t.Run("Profile successfully", func(t *testing.T) {
 		resData := user.Core{ID: uint(1), Nama: "helmi", Email: "helmi@gmail.com", HP: "08123456"}
 		repo.On("Profile", uint(1)).Return(resData, nil).Once()
 
@@ -135,7 +135,7 @@ func TestUpdate(t *testing.T) {
 	service := New(repo)
 
 	// Case: user mengganti nama
-	t.Run("Update success", func(t *testing.T) {
+	t.Run("Update successfully", func(t *testing.T) {
 		input := user.Core{Nama: "muzakir"}
 
 		resData := user.Core{ID: uint(1), Nama: "helmi", Email: "helmi@gmail.com", Alamat: "depok", HP: "081222222"}
@@ -201,5 +201,53 @@ func TestUpdate(t *testing.T) {
 }
 
 func TestDeactive(t *testing.T) {
+	repo := mocks.NewUserData(t)
+	srv := New(repo)
 
+	// Case: user melakukan deactive account dan berhasil tanpa mendapatkan error
+	t.Run("Deactive succesfully", func(t *testing.T) {
+		repo.On("Deactive", uint(1)).Return(nil).Once()
+
+		strToken := helper.GenerateToken(1)
+		token := helper.ValidateToken(strToken)
+		err := srv.Deactive(token)
+
+		assert.Nil(t, err)
+		repo.AssertExpectations(t)
+	})
+
+	// Case: user melakukan deactive account tetapi token/id tidak valid
+	t.Run("Deactive error id not found", func(t *testing.T) {
+		token := jwt.New(jwt.SigningMethodHS256)
+		err := srv.Deactive(token)
+
+		assert.NotNil(t, err)
+		assert.EqualError(t, err, "id user not found")
+	})
+
+	// Case: user melakukan deactive account tetapi id tidak ditemukan
+	t.Run("Deactive error user not found", func(t *testing.T) {
+		repo.On("Deactive", uint(1)).Return(errors.New("not found")).Once()
+
+		strToken := helper.GenerateToken(1)
+		token := helper.ValidateToken(strToken)
+		err := srv.Deactive(token)
+
+		assert.NotNil(t, err)
+		assert.EqualError(t, err, "data user not found")
+		repo.AssertExpectations(t)
+	})
+
+	// Case: user melakukan deactive account tetapi terjadi masalah pada database
+	t.Run("Deactive error internal server error", func(t *testing.T) {
+		repo.On("Deactive", uint(1)).Return(errors.New("internal server error")).Once()
+
+		strToken := helper.GenerateToken(1)
+		token := helper.ValidateToken(strToken)
+		err := srv.Deactive(token)
+
+		assert.NotNil(t, err)
+		assert.EqualError(t, err, "internal server error")
+		repo.AssertExpectations(t)
+	})
 }

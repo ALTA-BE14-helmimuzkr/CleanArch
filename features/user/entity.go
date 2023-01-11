@@ -4,11 +4,11 @@ import "github.com/labstack/echo/v4"
 
 type Core struct {
 	ID       uint
-	Nama     string
-	Email    string
+	Nama     string `validate:"min=3"`
+	Email    string `validate:"required,email"`
 	Alamat   string
-	HP       string
-	Password string
+	HP       string `validate:"min=9,max=13"`
+	Password string `validate:"required,min=4"`
 }
 
 type UserHandler interface {
