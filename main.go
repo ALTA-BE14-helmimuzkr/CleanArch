@@ -10,6 +10,7 @@ import (
 	userService "api/features/user/services"
 	"log"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
@@ -20,12 +21,14 @@ func main() {
 	db := config.InitDB(*cfg)
 	config.Migrate(db)
 
+	v := validator.New()
+
 	userData := userData.New(db)
 	userSrv := userService.New(userData)
 	userHdl := userHandler.New(userSrv)
 
 	bookData := bookData.New(db)
-	bookSrv := bookService.New(bookData)
+	bookSrv := bookService.New(bookData, v)
 	bookHdl := bookHandler.New(bookSrv)
 
 	e.Pre(middleware.RemoveTrailingSlash())
