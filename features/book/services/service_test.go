@@ -118,24 +118,20 @@ func TestAddBook(t *testing.T) {
 }
 
 func TestUpdateBook(t *testing.T) {
-	input := book.Core{
-		Judul:       "Naruto",
-		Penulis:     "Masashi Kishimoto",
-		TahunTerbit: 1999,
-	}
+	input := book.Core{Judul: "One Piece"}
 	resData := book.Core{
 		ID:          1,
-		Judul:       "Naruto",
-		Penulis:     "Masashi Kishimoto",
+		Judul:       "One Piece",
 		TahunTerbit: 1999,
+		Penulis:     "Masashi Kishimoto",
 		Pemilik:     "helmi",
 	}
 
 	repo := mocks.NewBookData(t)
 	v := validator.New()
 	srv := New(repo, v)
-	t.Run("Update Success", func(t *testing.T) {
 
+	t.Run("Update successfully", func(t *testing.T) {
 		repo.On("Update", 1, 1, input).Return(resData, nil).Once()
 
 		strToken := helper.GenerateToken(1)
@@ -147,6 +143,69 @@ func TestUpdateBook(t *testing.T) {
 		assert.Equal(t, resData.ID, actual.ID)
 		assert.Equal(t, resData.Pemilik, actual.Pemilik)
 
+		repo.AssertExpectations(t)
+	})
+
+	t.Run("Update error user not found", func(t *testing.T) {
+		// Program service
+		// strToken := helper.GenerateToken(1)
+		// token := helper.ValidateToken(strToken)
+		token := jwt.New(jwt.SigningMethodHS256)
+		actual, err := srv.Update(token, 1, input)
+
+		// Test
+		assert.NotNil(t, err)
+		assert.ErrorContains(t, err, "id user not found")
+		assert.Empty(t, actual)
+	})
+
+	t.Run("Update error invalid", func(t *testing.T) {
+		input := book.Core{
+			Judul:       "n",  // min 3 character
+			Penulis:     "ma", // min 3 character
+			TahunTerbit: 1800, // less than 1900
+		}
+
+		// Program service
+		strToken := helper.GenerateToken(1)
+		token := helper.ValidateToken(strToken)
+		actual, err := srv.Update(token, 1, input)
+
+		// Test
+		assert.NotNil(t, err)
+		assert.ErrorContains(t, err, "input update book invalid")
+		assert.Empty(t, actual)
+	})
+
+	t.Run("Update error book not found", func(t *testing.T) {
+		// Programming input and return repo
+		repo.On("Update", 1, 1, input).Return(book.Core{}, errors.New("not found")).Once()
+
+		// Program service
+		strToken := helper.GenerateToken(1)
+		token := helper.ValidateToken(strToken)
+		actual, err := srv.Update(token, 1, input)
+
+		// Test
+		assert.NotNil(t, err)
+		assert.ErrorContains(t, err, "book or user not found")
+		assert.Empty(t, actual)
+		repo.AssertExpectations(t)
+	})
+
+	t.Run("Update error internal server", func(t *testing.T) {
+		// Programming input and return repo
+		repo.On("Update", 1, 1, input).Return(book.Core{}, errors.New("internal server error")).Once()
+
+		// Program service
+		strToken := helper.GenerateToken(1)
+		token := helper.ValidateToken(strToken)
+		actual, err := srv.Update(token, 1, input)
+
+		// Test
+		assert.NotNil(t, err)
+		assert.ErrorContains(t, err, "internal server error")
+		assert.Empty(t, actual)
 		repo.AssertExpectations(t)
 	})
 }
@@ -217,6 +276,53 @@ func TestMyBook(t *testing.T) {
 		assert.Equal(t, resData[1].ID, actual[1].ID)
 		assert.Equal(t, resData[1].Judul, actual[1].Judul)
 	})
+}
 
-	
+func TestGetAllBook(t *testing.T) {
+	repo := mocks.NewBookData(t)
+	v := validator.New()
+	srv := New(repo, v)
+
+	// Case: user ingin menampilkan semua buku yang terdaftar
+	t.Run("MyBook list succesfully", func(t *testing.T) {
+		resData := []book.Core{
+			{
+				ID:          1,
+				Judul:       "Naruto",
+				Penulis:     "Masashi Kishimoto",
+				TahunTerbit: 1999,
+				Pemilik:     "helmi",
+			},
+			{
+				ID:          2,
+				Judul:       "Dragon ball",
+				Penulis:     "Akira toriyama",
+				TahunTerbit: 1998,
+				Pemilik:     "helmi",
+			},
+			{
+				ID:          3,
+				Judul:       "One piece",
+				Penulis:     "Oda sensei",
+				TahunTerbit: 1998,
+				Pemilik:     "muzakir",
+			},
+		}
+
+		// Programming input and return repo
+		repo.On("GetAllBook").Return(resData, nil).Once()
+
+		// Program service
+		actual, err := srv.GetAllBook()
+
+		// Test
+		assert.Nil(t, err)
+		assert.Equal(t, resData[0].ID, actual[0].ID)
+		assert.Equal(t, resData[0].Judul, actual[0].Judul)
+		assert.Equal(t, resData[0].Pemilik, actual[0].Pemilik)
+		assert.Equal(t, resData[1].ID, actual[1].ID)
+		assert.Equal(t, resData[1].Pemilik, actual[1].Pemilik)
+		assert.Equal(t, resData[2].ID, actual[2].ID)
+		assert.Equal(t, resData[2].Pemilik, actual[2].Pemilik)
+	})
 }

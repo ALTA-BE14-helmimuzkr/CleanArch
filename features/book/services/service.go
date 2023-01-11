@@ -48,7 +48,16 @@ func (bs *bookSrv) Add(token interface{}, newBook book.Core) (book.Core, error) 
 func (bs *bookSrv) Update(token interface{}, bookID int, updatedData book.Core) (book.Core, error) {
 	userID := helper.ExtractToken(token)
 	if userID <= 0 {
-		return book.Core{}, errors.New("user not found")
+		return book.Core{}, errors.New("id user not found")
+	}
+
+	err := bs.validate.Struct(updatedData)
+	if err != nil {
+		if _, ok := err.(*validator.InvalidValidationError); ok {
+			log.Println(err)
+		}
+		log.Println(err)
+		return book.Core{}, errors.New("input update book invalid")
 	}
 
 	res, err := bs.data.Update(userID, bookID, updatedData)
