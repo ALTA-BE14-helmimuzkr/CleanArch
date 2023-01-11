@@ -2,6 +2,8 @@ package config
 
 import (
 	"log"
+	"os"
+	"strconv"
 
 	"github.com/spf13/viper"
 )
@@ -69,7 +71,6 @@ func ReadEnv() *AppConfig {
 			return nil
 		}
 	}
-
 
 	JWT_KEY = app.jwtKey
 	return &app
