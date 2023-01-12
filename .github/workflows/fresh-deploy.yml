@@ -37,4 +37,4 @@ jobs:
           script: |
             docker rmi  ${{ secrets.DOCKER_USERNAME }}/book-api
             docker pull  ${{ secrets.DOCKER_USERNAME }}/book-api
-            docker run --name project-api -d -e DBUSER=${{ secrets.DB_USER }} -e DBPASS=${{ secrets.DB_PASS }} -e DBHOST=${{ secrets.DB_HOST }}  -e DBPORT=${{ secrets.DB_PORT }}  -e DBNAME=${{ secrets.DB_NAME }} -e JWT_KEY=${{ secrets.JWT_KEY }}  --link project-mysql -p 80:8000 ${{ secrets.DOCKER_USERNAME }}/book-api
+            docker run --name project-api -d -e DBUSER=${{ secrets.DB_USER }} -e DBPASS=${{ secrets.DB_PASS }} -e DBHOST=${{ secrets.DB_HOST }}  -e DBPORT=${{ secrets.DB_PORT }}  -e DBNAME=${{ secrets.DB_NAME }} -e JWT_KEY=${{ secrets.JWT_KEY }} -p 80:8000 ${{ secrets.DOCKER_USERNAME }}/book-api
