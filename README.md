@@ -12,7 +12,7 @@ API URL http://13.213.44.165
   POST /register
 ``
 Body Request - JSON
-```json
+``json
 {
 	"nama": string, 
 	"email": string,  
@@ -20,30 +20,30 @@ Body Request - JSON
 	"alamat": string,
 	"hp": string
 }
-```
+``
 ### Login
-```http
+``http
   POST /login
-```
+``
 Body Request - JSON
-```json
+``json
     {
         "email": string,
         "password": string,
     }
-```
+``
 ### Profile
 **Required** Token Bearer from login
-```http
+``http
   GET /users/profile
-```
+``
 ### Update
 **Required** Token Bearer from login
-```http
+``http
   PUT /users
-```
+``
 Body Request - JSON
-```json
+``json
 {
 	"nama": string,
 	"email": string,
@@ -51,65 +51,65 @@ Body Request - JSON
 	"alamat": string,
 	"hp": string
 }
-```
+``
 ### Deactive
 **Required** Token Bearer from login
-```http
+``http
   DELETE /users
-```
+``
 ## Book
 ### Get all book
-```http
+``http
   GET /books
-```
+``
 ### Get my book
 **Required** Token Bearer from login
-```http
+``http
   GET /books/mybook
-```
+``
 Body Request - JSON
-```json
+``json
 {
 		"judul": string,
 		"tahun_terbit": number,
 		"penulis": string
 }
-```
+``
 ### Add
 **Required** Token Bearer from login
-```http
+``http
   POST /books
-```
+``
 Body Request - JSON
-```json
+``json
 {
 		"judul": string,
 		"tahun_terbit": number,
 		"penulis": string
 }
-```
+``
 ### Update
 **Required** Token Bearer from login
-```http
+``http
   PUT /books/:id
-```
+``
 Body Request - JSON
-```json
+``json
 {
 		"judul": string,
 		"tahun_terbit": number,
 		"penulis": string
 }
-```
+``
 | Parameter | Type     | Description                        |
 | :-------- | :------- | :--------------------------------  |
 | `id`      | `string` | **Required**. Id of book to update |
 
 ### Delete
 **Required** Token Bearer from login
-```http
+``http
   DELETE /books/:id
-```
+``
 | Parameter | Type     | Description                        |
 | :-------- | :------- | :--------------------------------  |
 | `id`      | `string` | **Required**. Id of book to delete |
