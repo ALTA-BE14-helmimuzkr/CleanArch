@@ -1,5 +1,8 @@
 name: remote ssh command
-on: [deployment]
+on:  
+  deployment:
+    branches:
+      - main
 jobs:
 
   build:
