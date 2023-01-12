@@ -1,0 +1,42 @@
+name: remote ssh command
+on: [push]
+jobs:
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - ## 
+        name: Checkout
+        uses: actions/checkout@v3
+      - ## Login ke docker hub
+        name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+      - ## Set up docker build
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - ## Build and push image
+        name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/book-api:latest ## my image
+      - 
+        name: executing remote ssh commands using password
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY }}
+          port: ${{ secrets.PORT }}
+          script: |
+            docker rmi  ${{ secrets.DOCKER_USERNAME }}/book-api
+            docker pull  ${{ secrets.DOCKER_USERNAME }}/book-api
+            docker stop project-api
+            docker rm project-api
+            docker run --name project-api -d -e DBUSER=${{ secrets.DB_USER }} -e DBPASS=${{ secrets.DB_PASS }} -e DBHOST=${{ secrets.DB_HOST }}  -e DBPORT=${{ secrets.DB_PORT }}  -e DBNAME=${{ secrets.DB_NAME }} -e JWT_KEY=${{ secrets.JWT_KEY }}  --link project-mysql -p 80:8000 ${{ secrets.DOCKER_USERNAME }}/book-api
