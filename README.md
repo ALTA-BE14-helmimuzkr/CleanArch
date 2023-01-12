@@ -8,9 +8,9 @@ Jalankan perintah ``` sh unit-test.sh ``` untuk melakukan unit test
 API URL http://13.213.44.165
 ## USER
 ### Register
-```http
+``http
   POST /register
-```
+``
 Body Request - JSON
 ```json
 {
