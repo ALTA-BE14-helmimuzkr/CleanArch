@@ -4,7 +4,7 @@ import (
 	"api/features/book"
 	"api/helper"
 	"errors"
-	"log"
+	"fmt"
 	"strings"
 
 	"github.com/go-playground/validator/v10"
@@ -30,11 +30,8 @@ func (bs *bookSrv) Add(token interface{}, newBook book.Core) (book.Core, error) 
 
 	err := bs.validate.Struct(newBook)
 	if err != nil {
-		if _, ok := err.(*validator.InvalidValidationError); ok {
-			log.Println(err)
-		}
-		log.Println(err)
-		return book.Core{}, errors.New("input new book invalid")
+		msg := helper.ValidationErrorHandle(err)
+		return book.Core{}, fmt.Errorf("validation input failed on %s", msg)
 	}
 
 	res, err := bs.data.Add(userID, newBook)
@@ -53,11 +50,8 @@ func (bs *bookSrv) Update(token interface{}, bookID int, updatedData book.Core) 
 
 	err := bs.validate.Struct(updatedData)
 	if err != nil {
-		if _, ok := err.(*validator.InvalidValidationError); ok {
-			log.Println(err)
-		}
-		log.Println(err)
-		return book.Core{}, errors.New("input update book invalid")
+		msg := helper.ValidationErrorHandle(err)
+		return book.Core{}, fmt.Errorf("validation input failed on %s", msg)
 	}
 
 	res, err := bs.data.Update(userID, bookID, updatedData)
@@ -77,7 +71,7 @@ func (bs *bookSrv) Update(token interface{}, bookID int, updatedData book.Core) 
 func (bs *bookSrv) Delete(token interface{}, bookID int) error {
 	userID := helper.ExtractToken(token)
 	if userID <= 0 {
-		return errors.New("user not found")
+		return errors.New("id user not found")
 	}
 
 	err := bs.data.Delete(userID, bookID)
@@ -97,7 +91,7 @@ func (bs *bookSrv) Delete(token interface{}, bookID int) error {
 func (bs *bookSrv) MyBook(token interface{}) ([]book.Core, error) {
 	userID := helper.ExtractToken(token)
 	if userID <= 0 {
-		return nil, errors.New("user not found")
+		return nil, errors.New("id user not found")
 	}
 
 	res, err := bs.data.MyBook(userID)
@@ -123,7 +117,7 @@ func (bs *bookSrv) GetAllBook() ([]book.Core, error) {
 	if err != nil {
 		msg := ""
 		if strings.Contains(err.Error(), "not found") {
-			msg = "book not found"
+			msg = "books not found"
 		} else {
 			msg = "internal server error"
 		}

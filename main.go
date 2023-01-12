@@ -24,7 +24,7 @@ func main() {
 	v := validator.New()
 
 	userData := userData.New(db)
-	userSrv := userService.New(userData)
+	userSrv := userService.New(userData, v)
 	userHdl := userHandler.New(userSrv)
 
 	bookData := bookData.New(db)

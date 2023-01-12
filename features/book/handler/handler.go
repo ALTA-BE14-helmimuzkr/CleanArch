@@ -3,6 +3,7 @@ package handler
 import (
 	"api/features/book"
 	"api/helper"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -23,13 +24,15 @@ func (bh *bookHandle) Add() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		input := AddUpdateBookRequest{}
 		if err := c.Bind(&input); err != nil {
-			return c.JSON(http.StatusBadRequest, "format inputan salah")
+			log.Println(err)
+			return c.JSON(helper.PrintErrorResponse(err.Error()))
 		}
 
 		cnv := ToCore(input)
 
 		res, err := bh.srv.Add(c.Get("user"), *cnv)
 		if err != nil {
+			log.Println(err)
 			return c.JSON(helper.PrintErrorResponse(err.Error()))
 		}
 
@@ -43,7 +46,7 @@ func (bh *bookHandle) Update() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		input := AddUpdateBookRequest{}
 		if err := c.Bind(&input); err != nil {
-			return c.JSON(http.StatusBadRequest, "format inputan salah")
+			return c.JSON(helper.PrintErrorResponse(err.Error()))
 		}
 		cnv := ToCore(input)
 

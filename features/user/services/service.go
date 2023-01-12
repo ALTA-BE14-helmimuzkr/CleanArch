@@ -4,18 +4,21 @@ import (
 	"api/features/user"
 	"api/helper"
 	"errors"
+	"fmt"
 	"log"
 	"strings"
 
+	"github.com/go-playground/validator/v10"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type userUseCase struct {
-	qry user.UserData
+	qry      user.UserData
+	validate *validator.Validate
 }
 
-func New(ud user.UserData) user.UserService {
-	return &userUseCase{qry: ud}
+func New(ud user.UserData, v *validator.Validate) user.UserService {
+	return &userUseCase{qry: ud, validate: v}
 }
 
 func (uuc *userUseCase) Login(email, password string) (string, user.Core, error) {
@@ -41,6 +44,12 @@ func (uuc *userUseCase) Login(email, password string) (string, user.Core, error)
 }
 
 func (uuc *userUseCase) Register(newUser user.Core) (user.Core, error) {
+	err := uuc.validate.Struct(newUser)
+	if err != nil {
+		msg := helper.ValidationErrorHandle(err)
+		return user.Core{}, fmt.Errorf("validation input failed on %s", msg)
+	}
+
 	hashed, err := helper.HashPassword(newUser.Password)
 	if err != nil {
 		log.Println("bcrypt error ", err.Error())
@@ -84,6 +93,12 @@ func (uuc *userUseCase) Update(token interface{}, updateData user.Core) (user.Co
 	id := helper.ExtractToken(token)
 	if id <= 0 {
 		return user.Core{}, errors.New("invalid user id")
+	}
+
+	err := uuc.validate.Struct(updateData)
+	if err != nil {
+		msg := helper.ValidationErrorHandle(err)
+		return user.Core{}, fmt.Errorf("validation input failed on %s", msg)
 	}
 
 	res, err := uuc.qry.Update(uint(id), updateData)

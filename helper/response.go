@@ -55,6 +55,9 @@ func PrintErrorResponse(msg string) (int, interface{}) {
 		code = http.StatusBadRequest
 	case strings.Contains(msg, "validation"):
 		code = http.StatusBadRequest
+	case strings.Contains(msg, "unmarshal"):
+		resp["message"] = "bad request"
+		code = http.StatusBadRequest
 	}
 
 	return code, resp
