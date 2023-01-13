@@ -93,6 +93,10 @@ Body Request - JSON
 ```
   PUT /books/:id
 ```
+| Parameter | Type     | Description                        |
+| :-------- | :------- | :--------------------------------  |
+| `id`      | `string` | **Required**. Id of book to update |
+
 Body Request - JSON
 ```
 {
@@ -101,9 +105,6 @@ Body Request - JSON
 		"penulis": string
 }
 ```
-| Parameter | Type     | Description                        |
-| :-------- | :------- | :--------------------------------  |
-| `id`      | `string` | **Required**. Id of book to update |
 
 ### Delete
 **Required** Token Bearer from login
